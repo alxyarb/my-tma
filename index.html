@@ -8,7 +8,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
 
         body {
-            /* Фон с дорогой */
             background: url('https://alxyarb.github.io/my-tma/bg.jpg') no-repeat center center fixed;
             background-size: cover;
             color: white;
@@ -20,36 +19,86 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- ЭКРАН РУЛЕТКИ --- */
-        #roulette-screen {
-            display: flex;
+        /* --- ОБЩИЕ СТИЛИ --- */
+        .screen {
+            display: none;
             flex-direction: column;
             align-items: center;
             width: 100%;
             height: 100%;
             justify-content: center;
-            backdrop-filter: blur(8px);
-            background: rgba(0,0,0,0.7);
-            z-index: 10;
             position: absolute;
             top: 0;
             left: 0;
-            transition: opacity 1s ease;
+            transition: opacity 0.5s ease;
         }
 
-        /* Заголовок FREE BOT */
-        #roulette-screen h2 {
-            margin-bottom: 40px; 
+        .screen.active { display: flex; }
+        .backdrop { backdrop-filter: blur(8px); background: rgba(0,0,0,0.7); }
+
+        h2 {
+            margin-bottom: 30px; 
             text-align: center;
-            font-size: 36px;
+            font-size: 32px;
             color: #ffcc00;
             text-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
+        /* --- 1. ЭКРАН ЯЗЫКОВ --- */
+        .lang-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 80%;
+            max-width: 400px;
+        }
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .lang-btn.selected {
+            background: rgba(255, 204, 0, 0.2);
+            border-color: #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+            transform: scale(1.05);
+        }
+        .continue-btn {
+            margin-top: 40px;
+            background: #555;
+            color: #aaa;
+            border: none;
+            padding: 18px 60px;
+            font-size: 20px;
+            font-weight: 900;
+            border-radius: 40px;
+            cursor: not-allowed;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        .continue-btn.active {
+            background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%);
+            color: #1a1d29;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(255, 165, 0, 0.6);
+        }
+
+        /* --- 2. ЭКРАН РУЛЕТКИ --- */
         .roulette-wrapper {
             width: 100%;
             height: 150px;
@@ -62,88 +111,20 @@
             align-items: center;
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
+        .marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: #ff0000; transform: translateX(-50%); z-index: 5; box-shadow: 0 0 15px red; }
+        .roulette-strip { display: flex; gap: 15px; padding-left: 50%; will-change: transform; }
+        .card { min-width: 160px; height: 100px; background: linear-gradient(145deg, #ffffff, #e6e6e6); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 24px; font-weight: 900; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid #ccc; flex-shrink: 0; }
+        .card.winner { background: #ffcc00; box-shadow: 0 0 40px #ffcc00; transform: scale(1.1); border: 3px solid white; z-index: 2; }
+        .spin-btn { margin-top: 60px; background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%); border: none; padding: 18px 50px; font-size: 22px; font-weight: 900; border-radius: 40px; cursor: pointer; box-shadow: 0 0 25px rgba(255, 165, 0, 0.6); animation: pulse 2s infinite; text-transform: uppercase; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* Красная линия (Маркер) */
-        .marker {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: #ff0000;
-            transform: translateX(-50%);
-            z-index: 5;
-            box-shadow: 0 0 15px red;
-        }
-
-        /* Лента */
-        .roulette-strip {
-            display: flex;
-            gap: 15px; /* Отступ между карточками */
-            padding-left: 50%; /* Центр экрана - начало ленты */
-            will-change: transform;
-        }
-
-        .card {
-            min-width: 160px; /* Фиксированная ширина */
-            height: 100px;
-            background: linear-gradient(145deg, #ffffff, #e6e6e6);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-size: 24px;
-            font-weight: 900;
-            text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            text-shadow: 0 1px 0 rgba(255,255,255,1);
-            border: 1px solid #ccc;
-            flex-shrink: 0; /* Чтобы не сжимались */
-        }
-
-        /* Стиль победителя */
-        .card.winner {
-            background: #ffcc00;
-            box-shadow: 0 0 40px #ffcc00;
-            transform: scale(1.1);
-            border: 3px solid white;
-            z-index: 2;
-        }
-
-        .spin-btn {
-            margin-top: 60px;
-            background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%);
-            border: none;
-            padding: 18px 50px;
-            font-size: 22px;
-            font-weight: 900;
-            border-radius: 40px;
-            cursor: pointer;
-            box-shadow: 0 0 25px rgba(255, 165, 0, 0.6);
-            animation: pulse 2s infinite;
-            text-transform: uppercase;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 25px rgba(255, 165, 0, 0.6); }
-            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 165, 0, 0.9); }
-            100% { transform: scale(1); box-shadow: 0 0 25px rgba(255, 165, 0, 0.6); }
-        }
-
-        /* --- ЭКРАН ИГРЫ --- */
+        /* --- 3. ЭКРАН ИГРЫ --- */
         #game-screen {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            height: 100%;
             justify-content: space-between;
             padding: 20px 0;
-            backdrop-filter: blur(3px); /* Легкое размытие фона дороги */
+            backdrop-filter: blur(3px);
             background: rgba(0,0,0,0.3);
         }
-
         .header h1 { font-size: 24px; margin: 0; color: #ffcc00; text-shadow: 0 0 15px rgba(255,204,0,0.5); text-transform: uppercase; text-align: center; }
         .signal-box { position: relative; width: 250px; height: 250px; background: rgba(0, 0, 0, 0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 5px solid rgba(255, 204, 0, 0.3); backdrop-filter: blur(10px); }
         .signal-box::before { content: ''; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border-radius: 50%; border: 5px solid transparent; border-top-color: #ffcc00; animation: spin 2s linear infinite; opacity: 0; }
@@ -152,7 +133,6 @@
         #coefficient { font-size: 64px; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
         .result-success { color: #4cd137 !important; text-shadow: 0 0 20px rgba(76, 209, 55, 0.8) !important; }
         .btn-signal { background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%); border: none; padding: 20px 0; width: 80%; font-size: 22px; font-weight: 900; color: #1a1d29; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 0 #cc7a00; margin-bottom: 40px; }
-        
         .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; animation: fall linear forwards; z-index: 100; }
         @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
 
@@ -160,16 +140,27 @@
 </head>
 <body>
 
-    <div id="roulette-screen">
-        <h2>FREE BOT</h2>
+    <div id="language-screen" class="screen backdrop active">
+        <h2>SELECT LANGUAGE</h2>
+        <div class="lang-grid">
+            <button class="lang-btn" onclick="selectLang('pl', this)">🇵🇱 PL</button>
+            <button class="lang-btn" onclick="selectLang('ua', this)">🇺🇦 UA</button>
+            <button class="lang-btn" onclick="selectLang('kz', this)">🇰🇿 KZ</button>
+            <button class="lang-btn" onclick="selectLang('ru', this)">🇷🇺 RU</button>
+        </div>
+        <button id="continue-btn" class="continue-btn" onclick="checkHistoryAndProceed()">CONTINUE</button>
+    </div>
+
+    <div id="roulette-screen" class="screen backdrop">
+        <h2 id="roulette-header">FREE BOT FOR:</h2>
         <div class="roulette-wrapper">
             <div class="marker"></div>
             <div class="roulette-strip" id="strip"></div>
         </div>
-        <button class="spin-btn" onclick="startSpin()">SPIN</button>
+        <button class="spin-btn" id="spin-btn-text" onclick="startSpin()">SPIN</button>
     </div>
 
-    <div id="game-screen">
+    <div id="game-screen" class="screen">
         <div class="header">
             <h1>Chicken Road</h1>
             <p style="text-align:center; color:#ccc; margin-top:5px;">AI PREDICTOR v4.0</p>
@@ -181,72 +172,122 @@
     </div>
 
     <script>
-        // Проверка: заходил ли уже
-        const hasSpun = localStorage.getItem('chicken_spin_complete_v2'); // поменял ключ, чтобы у тебя сбросилось
-        
+        // --- ПЕРЕВОДЫ ---
+        const translations = {
+            pl: { 
+                rouletteTitle: "DARMOWY BOT NA:", 
+                spin: "KRĘCIĆ",
+                gameBtn: "OTRZYMAĆ SYGNAŁ 🍗", 
+                loading: "ANALIZOWANIE..." 
+            },
+            ua: { 
+                rouletteTitle: "БЕЗКОШТОВНИЙ БОТ НА:", 
+                spin: "КРУТИТИ",
+                gameBtn: "ОТРИМАТИ СИГНАЛ 🍗", 
+                loading: "АНАЛІЗ..." 
+            },
+            kz: { 
+                rouletteTitle: "ТЕГІН БОТ:", 
+                spin: "АЙНАЛДЫРУ",
+                gameBtn: "СИГНАЛ АЛУ 🍗", 
+                loading: "ТАЛДАУ..." 
+            },
+            ru: { 
+                rouletteTitle: "БЕСПЛАТНЫЙ БОТ НА:", 
+                spin: "КРУТИТЬ",
+                gameBtn: "ПОЛУЧИТЬ СИГНАЛ 🍗", 
+                loading: "АНАЛИЗ..." 
+            }
+        };
+
+        let currentLang = 'ru';
+        // Ключ v4 - чтобы ты снова мог пройти рулетку для теста
+        const hasSpun = localStorage.getItem('chicken_spin_complete_v4'); 
+
+        const langScreen = document.getElementById('language-screen');
         const rouletteScreen = document.getElementById('roulette-screen');
         const gameScreen = document.getElementById('game-screen');
         const strip = document.getElementById('strip');
-        
-        // Только английский язык
-        const items = ["7 DAYS", "10 DAYS", "25 DAYS", "60 DAYS", "8 DAYS", "90 DAYS", "15 DAYS"];
-        
-        // Генерируем 60 карточек
-        let html = "";
-        for(let i=0; i<60; i++) {
-            // Берем случайный текст
-            let text = items[Math.floor(Math.random() * items.length)];
-            
-            // НО! Для 35-й карточки (победной) ставим жестко 30 DAYS
-            if (i === 35) {
-                text = "30 DAYS";
-            }
-            
-            html += `<div class="card" id="card-${i}">${text}</div>`;
-        }
-        strip.innerHTML = html;
 
-        if (hasSpun) {
-            rouletteScreen.style.display = 'none';
-            gameScreen.style.display = 'flex';
+        // --- ЛОГИКА ВЫБОРА ЯЗЫКА ---
+        function selectLang(lang, btnElement) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
+            btnElement.classList.add('selected');
+            const contBtn = document.getElementById('continue-btn');
+            contBtn.classList.add('active');
+            contBtn.disabled = false;
+        }
+
+        // --- ЛОГИКА ПЕРЕХОДА ---
+        function checkHistoryAndProceed() {
+            // Скрываем экран языков
+            langScreen.style.opacity = '0';
+            setTimeout(() => {
+                langScreen.style.display = 'none';
+                
+                if (hasSpun) {
+                    // Старый игрок -> Игра
+                    showGame();
+                } else {
+                    // Новый игрок -> Рулетка
+                    showRoulette();
+                }
+            }, 500);
+        }
+
+        // --- ПОКАЗ РУЛЕТКИ С ПЕРЕВОДОМ ---
+        function showRoulette() {
+            // Переводим заголовок и кнопку
+            document.getElementById('roulette-header').innerText = translations[currentLang].rouletteTitle;
+            document.getElementById('spin-btn-text').innerText = translations[currentLang].spin;
+            
+            initRoulette(); // Создаем ленту
+            rouletteScreen.style.display = 'flex';
+            setTimeout(() => rouletteScreen.style.opacity = '1', 50);
+        }
+
+        function initRoulette() {
+            const items = ["7 DAYS", "10 DAYS", "25 DAYS", "60 DAYS", "8 DAYS", "90 DAYS", "15 DAYS"];
+            let html = "";
+            for(let i=0; i<60; i++) {
+                let text = items[Math.floor(Math.random() * items.length)];
+                if (i === 35) text = "30 DAYS";
+                html += `<div class="card" id="card-${i}">${text}</div>`;
+            }
+            strip.innerHTML = html;
         }
 
         function startSpin() {
             document.querySelector('.spin-btn').style.display = 'none';
-
-            // --- МАТЕМАТИКА КАЛИБРОВКИ ---
-            const cardWidth = 160;
-            const gap = 15;
-            const winningIndex = 35; // Мы всегда крутим до 35-й карточки
-            
-            // Ширина одной ячейки (карточка + отступ) = 175px
+            const cardWidth = 160; const gap = 15; const winningIndex = 35; 
             const unitWidth = cardWidth + gap;
-            
-            // Чтобы центрировать карточку, нам нужно сдвинуть ленту влево на:
-            // (Количество предыдущих карточек * ширину ячейки) + (Половину ширины самой карточки)
             const totalOffset = (winningIndex * unitWidth) + (cardWidth / 2);
 
-            // Запуск анимации
             strip.style.transition = "transform 4s cubic-bezier(0.15, 0.85, 0.15, 1)";
             strip.style.transform = `translateX(-${totalOffset}px)`;
 
             setTimeout(() => {
-                // Подсветка победной карточки (строго 35-я)
-                const winnerCard = document.getElementById(`card-${winningIndex}`);
-                winnerCard.classList.add('winner');
-                
+                document.getElementById(`card-${winningIndex}`).classList.add('winner');
                 createConfetti();
-                localStorage.setItem('chicken_spin_complete_v2', 'true');
-
+                localStorage.setItem('chicken_spin_complete_v4', 'true');
                 setTimeout(() => {
                     rouletteScreen.style.opacity = '0';
                     setTimeout(() => {
                         rouletteScreen.style.display = 'none';
-                        gameScreen.style.display = 'flex';
+                        showGame();
                     }, 1000);
                 }, 3000);
-
             }, 4000);
+        }
+
+        // --- ПОКАЗ ИГРЫ ---
+        function showGame() {
+            // Переводим кнопку игры
+            document.getElementById('signalBtn').innerText = translations[currentLang].gameBtn;
+            
+            gameScreen.style.display = 'flex';
+            setTimeout(() => gameScreen.style.opacity = '1', 50);
         }
 
         function getSignal() {
@@ -255,7 +296,7 @@
             const coef = document.getElementById('coefficient');
 
             btn.disabled = true;
-            btn.innerText = "CALCULATING...";
+            btn.innerText = translations[currentLang].loading;
             box.classList.add('loading');
             coef.classList.remove('result-success');
             coef.style.color = "#fff";
@@ -272,7 +313,7 @@
                 coef.classList.add('result-success');
                 if (navigator.vibrate) navigator.vibrate(100);
                 btn.disabled = false;
-                btn.innerText = "GET SIGNAL 🍗";
+                btn.innerText = translations[currentLang].gameBtn;
             }, 2000);
         }
 
