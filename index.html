@@ -71,7 +71,6 @@
         /* ИГРОВОЙ ЭКРАН */
         .header h1 { font-size: 22px; margin: 0; color: #ffcc00; text-transform: uppercase; text-align: center; }
         
-        /* НОВЫЙ ВЫБОР РЕЖИМА КНОПКАМИ */
         .mode-container { width: 90%; margin: 10px 0; display: flex; flex-direction: column; align-items: center; }
         .mode-label { font-size: 12px; color: #aaa; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
         .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; max-width: 300px; }
@@ -177,6 +176,14 @@
             ru: { langTitle: "ВЫБЕРИТЕ ЯЗЫК", rouletteTitle: "БЕСПЛАТНЫЙ БОТ НА:", spin: "КРУТИТЬ", gameBtn: "ПОЛУЧИТЬ СИГНАЛ 🍗", loading: "АНАЛИЗ...", loadingAlgo: "Загрузка алгоритмов", modeLabel: "ВЫБЕРИТЕ РЕЖИМ", chance: "Шанс:" }
         };
 
+        // ТВОИ НОВЫЕ ДАННЫЕ С ИКСАМИ ПО РЕЖИМАМ
+        const modeData = {
+            'easy': ["1.03", "1.07", "1.12", "1.17", "1.23", "1.29", "1.36", "1.44", "1.53", "1.63", "1.75", "1.88", "2.04", "2.22", "2.45"],
+            'medium': ["1.12", "1.28", "1.47", "1.70", "1.98", "2.33", "2.76", "3.32", "4.03", "4.96", "6.20"],
+            'hard': ["1.23", "1.55", "1.98", "2.56", "3.36", "4.49", "5.49", "7.53", "10.56"],
+            'hardcore': ["1.63", "2.80", "4.95", "9.08", "15.21"]
+        };
+
         let currentLang = 'ru';
         let currentMode = 'easy';
         const hasSpun = localStorage.getItem('chicken_spin_global_v3'); 
@@ -271,7 +278,7 @@
             progressBar.style.width = '0%';
 
             let startTime = Date.now();
-            let duration = 7000;
+            let duration = 3500; // Немного ускорил анализ для динамики
 
             let interval = setInterval(() => {
                 let elapsed = Date.now() - startTime;
@@ -279,7 +286,9 @@
                 if (progress >= 100) { clearInterval(interval); }
                 else {
                     progressBar.style.width = progress + "%";
-                    coef.innerText = "x" + (Math.random() * 8 + 1).toFixed(2);
+                    // Во время загрузки показываем случайные числа из общего списка для эффекта анализа
+                    const tempPool = modeData['easy'].concat(modeData['medium']);
+                    coef.innerText = "x" + tempPool[Math.floor(Math.random() * tempPool.length)];
                 }
             }, 50);
 
@@ -287,11 +296,14 @@
                 progressContainer.style.display = 'none';
                 progressText.style.display = 'none';
                 coef.style.opacity = "1";
-                const mults = { easy: [1.55, 2.45], medium: [2.85, 4.50], hard: [4.80, 7.20], hardcore: [7.50, 9.90] };
-                let final = (mults[currentMode][0] + Math.random() * (mults[currentMode][1] - mults[currentMode][0])).toFixed(2);
+                
+                // ВЫБОР ФИНАЛЬНОГО ИКСА СТРОГО ИЗ ТВОИХ СПИСКОВ
+                const pool = modeData[currentMode];
+                const finalX = pool[Math.floor(Math.random() * pool.length)];
+                
                 const chances = { easy: "97%", medium: "84%", hard: "71%", hardcore: "63%" };
 
-                coef.innerText = "x" + final;
+                coef.innerText = "x" + finalX;
                 coef.classList.add('result-success');
                 chanceTxt.innerText = translations[currentLang].chance + " " + chances[currentMode];
                 chanceTxt.style.opacity = "1";
